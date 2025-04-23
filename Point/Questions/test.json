@@ -1,0 +1,14 @@
+[
+    {
+        "questionText": "What type of modulation we dont have when using radio waves?",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["AM", "FM", "KKM"],
+            "correctAnswer": "KKM"
+        }
+    }
+]
