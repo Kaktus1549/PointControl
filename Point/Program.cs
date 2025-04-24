@@ -319,6 +319,7 @@ public class Questionare{
         string? correct      = q.Answer.CorrectAnswer;
         // Display the question
         string answerLayoutList = "";
+        int lines = Math.Max(0, Console.WindowHeight - 17);
         if (answerList != null && answerList.Count > 0)
         {
             // Your options: a) AM, b) FM, c) KKM
@@ -328,11 +329,14 @@ public class Questionare{
                 answerLayoutList += $"[bold]{alphabet[i]})[/] {answerList[i]} ";
             }
             answerLayoutList += "\n";
+            lines -= 1;
         }
+        Markup cancelationMarkup = new Markup("[grey][[For cancellation press SHIFT + Q]][/]");
         var questionBody = new SpectreUI.RowsRenderable(
             new Align(new Markup(questionText), HorizontalAlignment.Center),
             // Answer list if available
-            new Align(new Markup(answerLayoutList), HorizontalAlignment.Center)
+            new Align(new Markup(answerLayoutList + new string('\n', lines)), HorizontalAlignment.Center),
+            new Align(cancelationMarkup, HorizontalAlignment.Center)
         );
         
         questionPanel.Update(
@@ -442,6 +446,11 @@ public class Questionare{
                 else if (key.Key == ConsoleKey.Backspace && userInput.Length > 0)
                 {
                     userInput = userInput.Substring(0, userInput.Length - 1);
+                }
+                else if (key.Key == ConsoleKey.Q && key.Modifiers.HasFlag(ConsoleModifiers.Shift))
+                {
+                    // Handle SHIFT + Q for cancellation
+                    break;
                 }
                 else if (!char.IsControl(key.KeyChar))
                 {
