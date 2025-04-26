@@ -539,18 +539,22 @@ public async Task<bool> HandleQuestion(
                     else if (key.Key == ConsoleKey.Backspace && userInput.Length > 0)
                     {
                         userInput = userInput[..^1];
+                        userInput = userInput[..^1];
                     }
+                    // SHIFT+Q → cancel
                     else if (key.Key == ConsoleKey.Q && key.Modifiers.HasFlag(ConsoleModifiers.Shift))
                     {
                         result = true; // treat cancel as success
                         break;
                     }
+                    // Any other character
                     else if (!char.IsControl(key.KeyChar))
                     {
                         if (dynamic || userInput.Length == 0)
                             userInput += char.ToUpper(key.KeyChar);
                     }
                 }
+
 
                 await Task.Delay(50);
             }
