@@ -1,0 +1,13 @@
+services:
+  ssh:
+    container_name: base64-privescalation
+    build:
+      context: .
+    ports:
+      - 2001:22 
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "128M"
+    restart: unless-stopped

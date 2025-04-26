@@ -1,0 +1,110 @@
+[
+    {
+        "questionText": "What is the principle of least privilege",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["Users should have access to all resources", "Users should have access to everything they might need", "Users should have only the minimum access needed for their tasks"],
+            "correctAnswer": "Users should have only the minimum access needed for their tasks"
+        }
+    },
+    {
+        "questionText": "What is inside of the hidden file in your home folder?",
+        "outsorced": true,
+        "exec": "kitty sh -c 'ssh user@localhost -p 2000'",
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": true,
+            "answerList": null,
+            "correctAnswer": "CCT{Sup3rDup3rS3cr3t}"
+        }
+    },
+    {
+        "questionText": "Can you get privilege escalation and get /root/flag.txt?",
+        "outsorced": true,
+        "exec": "kitty sh -c 'ssh user@localhost -p 2001'",
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": true,
+            "answerList": null,
+            "correctAnswer": "CCT{w3ll_th4t_w4snt_h4rd}"
+        }
+    },
+    {
+        "questionText": "What is the default port for Rsyslog",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["550", "546", "514"],
+            "correctAnswer": "514"
+        }
+    },
+    {
+        "questionText": "What CIA triad stands for?",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["Confidentiality, Integrity, and Availability", "Confiscation, Intimidation, and Annihilation",  "Confidentiality, Integrity, and Accessibility"],
+            "correctAnswer": "Confidentiality, Integrity, and Availability"
+        }
+    },
+    {
+        "questionText": "Which one of these was the first computer virus?",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["Creeper", "Morris worm", "Brain"],
+            "correctAnswer": "Creeper"
+        }
+    },
+    {
+        "questionText": "Which one of these was the first computer antivirus?",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["F-PROT antivirus", "Reaper", "Avira anitivurs"],
+            "correctAnswer": "Reaper"
+        }
+    },
+    {
+        "questionText": "What is the first Linux distribution?",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["Slackware", "MCC Interim", "Unifix"],
+            "correctAnswer": "MMC Interim"
+        }
+    },
+    {
+        "questionText": "Everyone in your team has to do 20 squats, after you are dont select A)",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["Done", "nuh uh", "pewpew"],
+            "correctAnswer": "Done"
+        }
+    }
+]

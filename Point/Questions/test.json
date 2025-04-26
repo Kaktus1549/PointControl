@@ -13,23 +13,14 @@
     },
     {
         "questionText": "Lets see how fast can you type! On another window there is typing challange :D",
-        "outsorced": true,
-        "exec": "open /Users/kaktus1549/OneDrive/Desktop/KerektusStuff/Skola/AJ/headway_upperintermediate_students_book.pdf",
+        "outsorced": false,
+        "exec": null,
         "answer":{
             "checkerNeeded": false,
             "checker": null,
             "dynamic": true,
+            "answerList": null,
             "correctAnswer": "CCT{you_typed_the_text}"
-        }
-    },
-    {
-        "questionText": "What is value of register in Software/Windows/SecretKey?",
-        "outsorced": false,
-        "exec": null,
-        "answer":{
-            "checkerNeeded": true,
-            "checker": "./test.sh",
-            "dynamic": true
         }
     }
 ]

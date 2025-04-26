@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿﻿using System.Text;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using System.Text.Json;
@@ -25,6 +25,15 @@ public class SpectreUI
     // Generic helpers
     // ─────────────────────────────────────────────────────────────────────────────
 
+    public static void WriteGameLog(string path, decimal redTeamScore, decimal blueTeamScore, string winningTeamColor){
+        // Create a new log entry
+        string logEntry = $"{DateTime.Now}: RED TEAM: {redTeamScore}, BLUE TEAM: {blueTeamScore}, WINNING TEAM: {winningTeamColor}\n";
+        // Append the log entry to the file
+        File.AppendAllText(path, logEntry);
+        // Print the log entry to the console
+        Console.WriteLine(logEntry);
+    }
+
     public static void ShowBanner()
     {
         if (string.IsNullOrWhiteSpace(base64Ascii))
@@ -45,11 +54,15 @@ public class SpectreUI
         else
             finalMessage = "This point was held equally by [bold]both teams[/]!";
         var finalScreenMarkup = Encoding.UTF8.GetString(Convert.FromBase64String(finalScreen));
+        int padLines = Math.Max(0, Console.WindowHeight - 27);
         RowsRenderable rows = new RowsRenderable(
-            new Align(new Markup(finalScreenMarkup + "\n\n"), HorizontalAlignment.Center),
+            new Align(new Markup("\n\n\n\n\n" + finalScreenMarkup + "\n\n\n\n"), HorizontalAlignment.Center),
             new Align(new Markup($"[bold red]RED TEAM SCORE: {redTeamScore}[/]"), HorizontalAlignment.Center),
             new Align(new Markup($"[bold blue]    BLUE TEAM SCORE: {blueTeamScore}[/]"), HorizontalAlignment.Center),
-            new Align(new Markup(finalMessage), HorizontalAlignment.Center)
+            new Align(new Markup(new string('\n', padLines/2)), HorizontalAlignment.Center),
+            new Align(new Markup(finalMessage), HorizontalAlignment.Center),
+            new Align(new Markup("\n[grey][[Press ENTER to exit]][/]"), HorizontalAlignment.Center),
+            new Align(new Markup(new string('\n', padLines/2 - 4)), HorizontalAlignment.Center)
         );
         var popup = new Panel(rows)
             .Header("[bold]GAME OVER[/]")
@@ -61,6 +74,7 @@ public class SpectreUI
         while (Console.ReadKey(true).Key != ConsoleKey.Enter) { }
         AnsiConsole.Clear();
         Console.CursorVisible = true;
+        WriteGameLog("game_log.txt", (decimal)redTeamScore, (decimal)blueTeamScore, redTeamScore > blueTeamScore ? "RED" : (blueTeamScore > redTeamScore ? "BLUE" : "BOTH"));
         Process.GetCurrentProcess().Kill();
     }
     
@@ -347,7 +361,7 @@ public class Questionare{
                 UseShellExecute = false,
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
-                CreateNoWindow = true // Optional: don't show a console window
+                CreateNoWindow = false // Optional: don't show a console window
             }
         };
 
@@ -382,218 +396,174 @@ public class Questionare{
 
         return output.Contains("true");
     }
-    public async Task<bool> HandleQuestion(Layout root, Layout questionPanel, Layout answerPanel, string teamColor="RED")
+public async Task<bool> HandleQuestion(
+    Layout root,
+    Layout questionPanel,
+    Layout answerPanel,
+    string teamColor = "RED")
+{
+    // 1) Pick a random question
+    if (Questions.Count == 0)
     {
-        if (Questions.Count == 0)
-        {
-            Console.WriteLine("No questions available.");
-            System.Environment.Exit(1);
-            return false;
-        }
-        // Randomly select a question
-        _questionIndex = GetRandomNumber(0, Questions.Count);
-        var q = Questions[_questionIndex];
-        //  Example -> {
-        //     "questionText": "What type of modulation we dont have when using radio waves?",
-        //     "outsorced": false,
-        //     "exec": null,
-        //     "answer":{
-        //         "checkerNeeded": false,
-        //         "checker": null,
-        //         "dynamic": false,
-        //         "answerList": ["AM", "FM", "KKM"],
-        //         "correctAnswer": "KKM"
-        //     }
-        // }
-        // Render the question via SpectreUI
-        string questionText = q.QuestionText;
-        bool   outsorced     = q.Outsorced;
-        string? exec        = q.Exec;
-        bool   checkerNeeded = q.Answer.CheckerNeeded;
-        bool   dynamic       = q.Answer.Dynamic;
-        string? checker      = q.Answer.Checker;
-        var    answerList    = q.Answer.AnswerList;     
-        string? correct      = q.Answer.CorrectAnswer;
-        // Display the question
-        string answerLayoutList = "";
-        int lines = Math.Max(0, Console.WindowHeight - 17);
-        if (answerList != null && answerList.Count > 0)
-        {
-            // Your options: a) AM, b) FM, c) KKM
-            answerLayoutList += "\nYour options: ";
-            for (int i = 0; i < answerList.Count; i++)
-            {
-                answerLayoutList += $"[bold]{alphabet[i]})[/] {answerList[i]} ";
-            }
-            answerLayoutList += "\n";
-            lines -= 1;
-        }
-        Markup cancelationMarkup = new Markup("[grey][[For cancellation press SHIFT + Q]][/]");
-        var questionBody = new SpectreUI.RowsRenderable(
-            new Align(new Markup(questionText), HorizontalAlignment.Center),
-            // Answer list if available
-            new Align(new Markup(answerLayoutList + new string('\n', lines)), HorizontalAlignment.Center),
-            new Align(cancelationMarkup, HorizontalAlignment.Center)
-        );
-        
-        questionPanel.Update(
-            new Panel(questionBody)
-                .Header("[bold]Question[/]")
-                .Border(BoxBorder.Rounded)
-                .BorderStyle(Style.Parse("cyan"))
-                .Expand());
-        // Display the question
-        AnsiConsole.Clear();
-        AnsiConsole.Write(root);
-        if(outsorced){
-            if (string.IsNullOrWhiteSpace(exec))
-            {
-                Console.WriteLine("No exec found in the question.");
-                System.Environment.Exit(1);
-            }
-            // Execute the program in the background
-            ExecuteProgram(exec);
-        }
-        string userInput = string.Empty;
-            while (true){
-                if(SpectreUI.GetEndGame() < DateTime.Now)
-                {
-                    // End the game if the time is up
-                    SpectreUI.EndGame();
-                    break;
-                }
-                Console.CursorVisible = false;
-                // Display the `WordEnter` panel with user input text dynamically
-                answerPanel.Update(new Panel($"Enter your answer: [blue]{userInput}[/]")
-                    .Header("[bold]WordEnter[/]")
-                    .Border(BoxBorder.Rounded)
-                    .BorderStyle(Style.Parse("blue"))
-                    .Expand()
-                );
-                AnsiConsole.Clear();
-                AnsiConsole.Write(root);
+        Console.WriteLine("No questions available.");
+        Environment.Exit(1);
+    }
 
-                // Capture single character input
-                if (Console.KeyAvailable){
+    _questionIndex = GetRandomNumber(0, Questions.Count);
+    var q = Questions[_questionIndex];
+
+    // 2) Pull out question fields
+    string questionText      = q.QuestionText;
+    bool   outsorced         = q.Outsorced;
+    string? exec             = q.Exec;
+    bool   checkerNeeded     = q.Answer.CheckerNeeded;
+    string? checker          = q.Answer.Checker;
+    bool   dynamic           = q.Answer.Dynamic;
+    List<string>? answerList = q.Answer.AnswerList;
+    string? correct          = q.Answer.CorrectAnswer;
+
+    // 3) Fire off external exec if needed
+    if (outsorced)
+    {
+        if (string.IsNullOrWhiteSpace(exec))
+        {
+            Console.WriteLine("No exec found in the question.");
+            Environment.Exit(1);
+        }
+        ExecuteProgram(exec!);
+    }
+
+    bool result = false;
+    string userInput = "";
+
+    // 4) Single Live session driving the Q&A loop
+    await AnsiConsole.Live(root)
+        .AutoClear(false)
+        .Overflow(VerticalOverflow.Ellipsis)
+        .Cropping(VerticalOverflowCropping.Top)
+        .StartAsync(async ctx =>
+        {
+            int totalVertical = Console.WindowHeight - 17;
+            var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            while (DateTime.Now < SpectreUI.GetEndGame())
+            {
+                // Build the options markup
+                var optionsMarkup = "";
+                if (answerList?.Count > 0)
+                {
+                    optionsMarkup = "[bold]Your options:[/] ";
+                    for (int i = 0; i < answerList.Count; i++)
+                        optionsMarkup += $"[bold]{alphabet[i]})[/] {answerList[i]} ";
+                }
+
+                // Update question panel
+                int paddingLines = Math.Max(0, totalVertical - (answerList?.Count > 0 ? 1 : 0));
+                var questionBody = new SpectreUI.RowsRenderable(
+                    new Align(new Markup(questionText), HorizontalAlignment.Center),
+                    new Align(new Markup(optionsMarkup + "\n" + new string('\n', paddingLines)), HorizontalAlignment.Center),
+                    new Align(new Markup("[grey][[Shift+Q to cancel]][/]"), HorizontalAlignment.Center)
+                );
+                questionPanel.Update(
+                    new Panel(questionBody)
+                        .Header("[bold]Question[/]")
+                        .Border(BoxBorder.Rounded)
+                        .BorderStyle(Style.Parse("cyan"))
+                        .Expand()
+                );
+
+                // Update answer panel
+                answerPanel.Update(
+                    new Panel($"Enter your answer: [blue]{userInput}[/]")
+                        .Header("[bold]WordEnter[/]")
+                        .Border(BoxBorder.Rounded)
+                        .BorderStyle(Style.Parse("blue"))
+                        .Expand()
+                );
+
+                // Diff-based repaint
+                ctx.Refresh();
+
+                // Non-blocking input
+                if (Console.KeyAvailable)
+                {
                     var key = Console.ReadKey(intercept: true);
+
                     if (key.Key == ConsoleKey.Enter)
                     {
-                        if (dynamic == false && userInput.Length != 1){
+                        if (!dynamic && userInput.Length != 1)
                             continue;
-                        }
-                        // Process the completed input
-                        var guess = userInput.ToLower();
-                        
-                        if (dynamic){
-                            // Check if input is equal to the correct answer in lower case
-                            if (correct != null && guess == correct.ToLower() && !checkerNeeded)
-                            {
-                                if (teamColor.Contains("RED", StringComparison.OrdinalIgnoreCase))
-                                    SpectreUI.ControllingTeam("RED");
-                                else
-                                    SpectreUI.ControllingTeam("BLUE");
-                                break;
-                            }
 
-                            if(checkerNeeded){
-                                // Check if the answer is correct using the checker program
-                                if (checker != null && ExecuteChecker($"{checker} {guess}"))
-                                {
-                                    if (teamColor.Contains("RED", StringComparison.OrdinalIgnoreCase))
-                                        SpectreUI.ControllingTeam("RED");
-                                    else
-                                        SpectreUI.ControllingTeam("BLUE");
-                                    break;
-                                }
-                                else
-                                {
-                                    // Lockdown protocol
-                                    return false;
-                                }
-                            }
-                            else
+                        var guess = userInput.ToLowerInvariant();
+                        bool isCorrect = false;
+
+                        if (dynamic)
+                        {
+                            if (!checkerNeeded && string.Equals(guess, correct?.ToLower(), StringComparison.Ordinal))
                             {
-                                // Lockdown protocol
-                                return false;
+                                isCorrect = true;
                             }
-                            
+                            else if (checkerNeeded && checker is not null && ExecuteChecker($"{checker} {guess}"))
+                            {
+                                isCorrect = true;
+                            }
                         }
-                        else{
-                            // Check if input is equal to the correct answer in lower case
-                            if (correct != null && guess == correct.ToLower())
+                        else
+                        {
+                            if (string.Equals(guess, correct?.ToLower(), StringComparison.Ordinal))
                             {
-                                if (teamColor.Contains("RED", StringComparison.OrdinalIgnoreCase))
-                                    SpectreUI.ControllingTeam("RED");
-                                else
-                                    SpectreUI.ControllingTeam("BLUE");
-                                break;
+                                isCorrect = true;
                             }
-                            if (userInput.Length == 1)
+                            else if (userInput.Length == 1 && answerList?.Count > 0)
                             {
-                                if (answerList != null && answerList.Count > 0)
+                                int idx = alphabet.IndexOf(userInput.ToUpper());
+                                if (idx >= 0 &&
+                                    string.Equals(answerList[idx], correct, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    // Check if the input is in the answer list
-                                    int index = alphabet.IndexOf(userInput.ToUpper());  
-                                    string answer = string.Empty;
-                                    try{
-                                        answer = answerList[index];
-                                    }
-                                    catch (ArgumentOutOfRangeException)
-                                    {
-                                        // Lockdown protocol
-                                        return false;
-                                    }
-                                    if (answer != null && answer.ToLower() == correct?.ToLower())
-                                    {
-                                        if (teamColor.Contains("RED", StringComparison.OrdinalIgnoreCase))
-                                            SpectreUI.ControllingTeam("RED");
-                                        else
-                                            SpectreUI.ControllingTeam("BLUE");
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        // Lockdown protocol
-                                        return false;
-                                    }
-                                }
-                                else
-                                {
-                                    // Lockdown protocol
-                                    return false;
+                                    isCorrect = true;
                                 }
                             }
                         }
-                        // Clear the user input
-                        userInput = string.Empty;
+
+                        if (isCorrect)
+                        {
+                            result = true;                          // ← set result
+                        }
+                        else
+                        {
+                            result = false;                         // ← wrong → lockdown
+                        }
+
+                        break; // exit the live loop
                     }
                     else if (key.Key == ConsoleKey.Backspace && userInput.Length > 0)
                     {
-                        userInput = userInput.Substring(0, userInput.Length - 1);
+                        userInput = userInput[..^1];
+                        userInput = userInput[..^1];
                     }
+                    // SHIFT+Q → cancel
                     else if (key.Key == ConsoleKey.Q && key.Modifiers.HasFlag(ConsoleModifiers.Shift))
                     {
-                        // Handle SHIFT + Q for cancellation
+                        result = true; // treat cancel as success
                         break;
                     }
+                    // Any other character
                     else if (!char.IsControl(key.KeyChar))
                     {
-                        if (dynamic == false && userInput.Length >= 1)
-                        {
-                            // Continue if the user input is not 1 character, without any other checks
-                            continue;
-                        }
-                        userInput += char.ToUpper(key.KeyChar);
+                        if (dynamic || userInput.Length == 0)
+                            userInput += char.ToUpper(key.KeyChar);
                     }
-                    // Sleep for 25ms to avoid screen flickering
                 }
+
+
                 await Task.Delay(50);
             }
-        // Clear the console after the answer is processed
-        Console.Clear();
-        // Remove the question from the list
-        return true;
-    }
+        });
+
+    // 5) Clear and return final result
+    Console.Clear();
+    return result;
+}
 }
 
 public class Program
@@ -694,6 +664,9 @@ public class Program
             var (root, historyPanel, inputPanel) = SpectreUI.ChallangeLayout();
             // Run the question handler
             teamSuccess = await questionare.HandleQuestion(root, historyPanel, inputPanel, option);
+            if (teamSuccess == true){
+                SpectreUI.ControllingTeam(option);
+            }
             if (teamSuccess == false)
             {
                 // Lockdown protocol
