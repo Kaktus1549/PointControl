@@ -544,7 +544,7 @@ public async Task<bool> HandleQuestion(
                     // SHIFT+Q → cancel
                     else if (key.Key == ConsoleKey.Q && key.Modifiers.HasFlag(ConsoleModifiers.Shift))
                     {
-                        result = true; // treat cancel as success
+                        result = false; // treat cancel as wrong answer
                         break;
                     }
                     // Any other character
