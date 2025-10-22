@@ -538,8 +538,11 @@ public async Task<bool> HandleQuestion(
                     }
                     else if (key.Key == ConsoleKey.Backspace && userInput.Length > 0)
                     {
-                        userInput = userInput[..^1];
-                        userInput = userInput[..^1];
+                        try{
+                            userInput = userInput[..^1];
+                        } catch (IndexOutOfRangeException){
+                            userInput = "";
+                        }
                     }
                     // SHIFT+Q → cancel
                     else if (key.Key == ConsoleKey.Q && key.Modifiers.HasFlag(ConsoleModifiers.Shift))
