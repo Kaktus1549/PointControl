@@ -219,47 +219,68 @@ public class SpectreUI
         ShowDecentralization(border);
     }
 
-    private static void ShowDecentralization(string borderColor)
-    {
+    private static void ShowDecentralization(string borderColor){
         int totalSeconds = decentralizationTime;
         int current = 0;
 
-        while (true)
-        {
-        // Progress bar string (15 characters) – escape markup brackets.
-        string bar = new string('█', current * 2) + new string('─', (totalSeconds * 2) - (current * 2));
-        string barMarkup = $"          [[{bar}]] {current:D2}/{totalSeconds:D2}";
+        // Initial renderable
+        var bar = new string('─', totalSeconds * 2);
+        var barMarkup = $"          [[{bar}]] 00/{totalSeconds:D2}";
 
         var content = new RowsRenderable(
             new Align(new Markup("For cancellation press ENTER"), HorizontalAlignment.Center),
             new Align(new Markup(barMarkup), HorizontalAlignment.Center)
         );
+        Console.Clear();
 
-        var popup = new Panel(content)
+        var panel = new Panel(content)
             .Header("")
             .Border(BoxBorder.None)
             .BorderStyle(Style.Parse(borderColor));
 
-        AnsiConsole.Clear();
-        // Display as a popup centered on the screen.
-        AnsiConsole.Write(new Align(popup, HorizontalAlignment.Center, VerticalAlignment.Middle));
+        // Use Live display for dynamic updates
+        AnsiConsole.Live(panel)
+            .AutoClear(false)
+            .Start(ctx =>
+            {
+                while (current <= totalSeconds)
+                {
+                    // Handle cancellation
+                    if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Enter)
+                    {
+                        ControllingTeam(borderColor);
+                        return;
+                    }
 
-        // Handle completion or cancellation.
-        if (current == totalSeconds)
-            break;
-        if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Enter)
-        {
-            // Call ControllingTeam() with the same border color.
-            ControllingTeam(borderColor);
-            return;
-        }
+                    // Build updated bar
+                    string filled = new string('█', current * 2);
+                    string empty = new string('─', (totalSeconds * 2) - (current * 2));
+                    string barUpdated = $"    [[{filled}{empty}]] {current:D2}/{totalSeconds:D2}";
 
-        Thread.Sleep(1000);
-        current++;
-        }
+                    // Update content
+                    var updatedContent = new RowsRenderable(
+                        new Align(new Markup("For cancellation press ENTER"), HorizontalAlignment.Center),
+                        new Align(new Markup(barUpdated), HorizontalAlignment.Center)
+                    );
+
+                    panel = new Panel(updatedContent)
+                        .Header("")
+                        .Border(BoxBorder.None)
+                        .BorderStyle(Style.Parse(borderColor));
+
+                    // Refresh live display
+                    ctx.UpdateTarget(panel);
+
+                    Thread.Sleep(1000);
+                    current++;
+                }
+
+                // Done — clear and exit
+            });
         Console.Clear();
         return;
     }
+
 
     // Helper renderable that stacks items vertically.
     public sealed class RowsRenderable : IRenderable
