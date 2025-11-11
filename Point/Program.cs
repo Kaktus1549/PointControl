@@ -226,6 +226,7 @@ public class SpectreUI
         // Initial renderable
         var bar = new string('─', totalSeconds * 2);
         var barMarkup = $"          [[{bar}]] 00/{totalSeconds:D2}";
+        bool cancelled = false;
 
         var content = new RowsRenderable(
             new Align(new Markup("For cancellation press ENTER"), HorizontalAlignment.Center),
@@ -248,8 +249,8 @@ public class SpectreUI
                     // Handle cancellation
                     if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Enter)
                     {
-                        ControllingTeam(borderColor);
-                        return;
+                        cancelled = true;
+                        break;
                     }
 
                     // Build updated bar
@@ -277,6 +278,11 @@ public class SpectreUI
 
                 // Done — clear and exit
             });
+        if (cancelled){
+            Console.Clear();
+            ControllingTeam(borderColor);
+            return;
+        }
         Console.Clear();
         return;
     }
