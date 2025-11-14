@@ -396,8 +396,8 @@ public class Questionare{
                 FileName = shell,
                 Arguments = prefix + command,
                 UseShellExecute = false,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             }
         };
