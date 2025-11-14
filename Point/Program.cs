@@ -374,48 +374,34 @@ public class Questionare{
     }
 
     public void ExecuteProgram(string command)
+{
+    string shell = OperatingSystem.IsWindows() ? "cmd.exe" : "/bin/bash";
+    string prefix = OperatingSystem.IsWindows() ? "/c " : "-c ";
+
+    var process = new Process
     {
-        string shell;
-        string prefix;
-
-        if (OperatingSystem.IsWindows())
+        StartInfo = new ProcessStartInfo
         {
-            shell = "cmd.exe";
-            prefix = "/c ";
+            FileName = shell,
+            Arguments = prefix + command,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
         }
-        else
-        {
-            shell = "/bin/bash";
-            prefix = "-c ";
-        }
+    };
 
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = shell,
-                Arguments = prefix + command,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true
-            }
-        };
+    process.Start();
 
-        process.Start(); // Runs in background
-        
-        string output = process.StandardOutput.ReadToEnd();
-        string error = process.StandardError.ReadToEnd();
-        process.WaitForExit();
+    string output = process.StandardOutput.ReadToEnd();
+    string error = process.StandardError.ReadToEnd();
 
-        using (var logStream = new StreamWriter("./debug.log", append: true))
-        {
-            logStream.WriteLine($"Executing command: {command}");
-            logStream.WriteLine($"Output: {output}");
-            logStream.WriteLine($"Error: {error}");
-        }
+    process.WaitForExit();
 
-    }
+    File.AppendAllText("./debug.log",
+        $"Executing command: {command}\nOutput: {output}\nError: {error}\nExit: {process.ExitCode}\n\n");
+}
+
 
 
     public bool ExecuteChecker(string command)
