@@ -402,11 +402,14 @@ public class Questionare{
             }
         };
 
-        // Save debug output to ./debug.log
-        // using (var logStream = new StreamWriter("./debug.log", append: true))
-        // {
-        //     logStream.WriteLine($"Executing command: {command}");
-        // }
+        string output = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+
+        Save debug output to ./debug.log
+        using (var logStream = new StreamWriter("./debug.log", append: true))
+        {
+            logStream.WriteLine($"Executing command: {command}");
+        }
 
         process.Start(); // Runs in background
     }
