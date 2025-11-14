@@ -405,12 +405,14 @@ public class Questionare{
         process.Start(); // Runs in background
         
         string output = process.StandardOutput.ReadToEnd();
+        string error = process.StandardError.ReadToEnd();
         process.WaitForExit();
 
         using (var logStream = new StreamWriter("./debug.log", append: true))
         {
             logStream.WriteLine($"Executing command: {command}");
             logStream.WriteLine($"Output: {output}");
+            logStream.WriteLine($"Error: {error}");
         }
 
     }
