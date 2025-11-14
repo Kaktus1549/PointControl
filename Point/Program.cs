@@ -405,7 +405,6 @@ public class Questionare{
         string output = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
 
-        Save debug output to ./debug.log
         using (var logStream = new StreamWriter("./debug.log", append: true))
         {
             logStream.WriteLine($"Executing command: {command}");
