@@ -9,7 +9,7 @@ RUN useradd -m skajp && echo "skajp:heslo" | chpasswd
 RUN echo "skajp  ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 # Add the flag
-RUN echo "Password is: C4T" > /home/user/.flag.txt
+RUN echo "Password is: H1DD3N" > /home/user/.flag.txt
 
 
 RUN echo "\n----- AIRSPORT -----\nUser: user\nPassword: heslo\nFlag location: Unkown\nGoal: Get the flag contents\n--------------------\n" > /etc/ssh/banner.txt
