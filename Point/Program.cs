@@ -392,12 +392,11 @@ public class Questionare{
     };
 
     process.Start();
-
     string output = process.StandardOutput.ReadToEnd();
     string error = process.StandardError.ReadToEnd();
 
     process.WaitForExit();
-
+    Thread.Sleep(500);
     File.AppendAllText("./debug.log",
         $"Executing command: {command}\nOutput: {output}\nError: {error}\nExit: {process.ExitCode}\n\n");
 }
@@ -440,7 +439,7 @@ public class Questionare{
                                             .ToLower();
 
         process.WaitForExit();
-
+        Thread.Sleep(500);
         // using (var logStream = new StreamWriter("./debug.log", append: true))
         // {
         //     logStream.WriteLine($"Checker command: {command}");
