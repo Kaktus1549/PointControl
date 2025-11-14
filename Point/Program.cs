@@ -409,6 +409,7 @@ public class Questionare{
         using (var logStream = new StreamWriter("./debug.log", append: true))
         {
             logStream.WriteLine($"Executing command: {command}");
+            logStream.WriteLine($"Output: {output}");
         }
 
         process.Start(); // Runs in background
