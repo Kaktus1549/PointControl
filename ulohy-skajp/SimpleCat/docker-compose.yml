@@ -1,0 +1,12 @@
+services:
+  ssh:
+    container_name: airsport-cat
+    build: .
+    ports:
+      - 2221:22 
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "128M"
+    restart: unless-stopped
