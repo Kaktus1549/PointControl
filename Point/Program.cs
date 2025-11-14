@@ -375,38 +375,59 @@ public class Questionare{
 
     public void ExecuteProgram(string command)
     {
-        var parts = command.Split(' ', 2); // Split into program and arguments
-        string fileName = parts[0];
-        string arguments = parts.Length > 1 ? parts[1] : "";
+        string shell;
+        string prefix;
+
+        if (OperatingSystem.IsWindows())
+        {
+            shell = "cmd.exe";
+            prefix = "/c ";
+        }
+        else
+        {
+            shell = "/bin/bash";
+            prefix = "-c ";
+        }
 
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = fileName,
-                Arguments = arguments,
+                FileName = shell,
+                Arguments = prefix + command,
                 UseShellExecute = false,
                 RedirectStandardOutput = false,
                 RedirectStandardError = false,
-                CreateNoWindow = true // Optional: don't show a console window
+                CreateNoWindow = true
             }
         };
 
-        process.Start(); // Run in background, method continues without waiting
+        process.Start(); // Runs in background
     }
+
 
     public bool ExecuteChecker(string command)
     {
-        var parts = command.Split(' ', 2); // Split into program and arguments
-        string fileName = parts[0];
-        string arguments = parts.Length > 1 ? parts[1] : "";
+        string shell;
+        string prefix;
+
+        if (OperatingSystem.IsWindows())
+        {
+            shell = "cmd.exe";
+            prefix = "/c ";
+        }
+        else
+        {
+            shell = "/bin/bash";
+            prefix = "-c ";
+        }
 
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = fileName,
-                Arguments = arguments,
+                FileName = shell,
+                Arguments = prefix + command,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -416,13 +437,15 @@ public class Questionare{
 
         process.Start();
 
-        // Read the output (can be async too, but here we keep it simple)
-        string output = process.StandardOutput.ReadToEnd().Trim().ToLower();
+        string output = process.StandardOutput.ReadToEnd()
+                                            .Trim()
+                                            .ToLower();
 
         process.WaitForExit();
 
         return output.Contains("true");
     }
+
 public async Task<bool> HandleQuestion(
     Layout root,
     Layout questionPanel,
