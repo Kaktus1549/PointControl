@@ -402,6 +402,8 @@ public class Questionare{
             }
         };
 
+        process.Start(); // Runs in background
+        
         string output = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
 
@@ -411,7 +413,6 @@ public class Questionare{
             logStream.WriteLine($"Output: {output}");
         }
 
-        process.Start(); // Runs in background
     }
 
 
