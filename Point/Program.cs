@@ -376,14 +376,14 @@ public class Questionare{
     public void ExecuteProgram(string command)
 {
     string shell = OperatingSystem.IsWindows() ? "cmd.exe" : "/bin/bash";
-    string prefix = OperatingSystem.IsWindows() ? "/c " : "-c '";
+    string prefix = OperatingSystem.IsWindows() ? "/c " : "-c ";
 
     var process = new Process
     {
         StartInfo = new ProcessStartInfo
         {
             FileName = shell,
-            Arguments = prefix + command + (OperatingSystem.IsWindows() ? "" : "'"),
+            Arguments = prefix + command,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -417,7 +417,7 @@ public class Questionare{
         else
         {
             shell = "/bin/bash";
-            prefix = "-c '";
+            prefix = "-c ";
         }
 
         var process = new Process
@@ -425,7 +425,7 @@ public class Questionare{
             StartInfo = new ProcessStartInfo
             {
                 FileName = shell,
-                Arguments = prefix + command + (OperatingSystem.IsWindows() ? "" : "'"),
+                Arguments = prefix + command,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
