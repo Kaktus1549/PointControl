@@ -403,10 +403,10 @@ public class Questionare{
         };
 
         // Save debug output to ./debug.log
-        using (var logStream = new StreamWriter("./debug.log", append: true))
-        {
-            logStream.WriteLine($"Executing command: {command}");
-        }
+        // using (var logStream = new StreamWriter("./debug.log", append: true))
+        // {
+        //     logStream.WriteLine($"Executing command: {command}");
+        // }
 
         process.Start(); // Runs in background
     }
@@ -449,11 +449,11 @@ public class Questionare{
 
         process.WaitForExit();
 
-        using (var logStream = new StreamWriter("./debug.log", append: true))
-        {
-            logStream.WriteLine($"Checker command: {command}");
-            logStream.WriteLine($"Checker output: {output}");
-        }
+        // using (var logStream = new StreamWriter("./debug.log", append: true))
+        // {
+        //     logStream.WriteLine($"Checker command: {command}");
+        //     logStream.WriteLine($"Checker output: {output}");
+        // }
 
         return output.Contains("true");
     }
