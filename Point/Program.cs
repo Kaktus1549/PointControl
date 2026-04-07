@@ -374,39 +374,56 @@ public class Questionare{
     }
 
     public void ExecuteProgram(string command)
+{
+    string shell = OperatingSystem.IsWindows() ? "cmd.exe" : "/bin/bash";
+    string prefix = OperatingSystem.IsWindows() ? "/c " : "-c ";
+
+    var process = new Process
     {
-        var parts = command.Split(' ', 2); // Split into program and arguments
-        string fileName = parts[0];
-        string arguments = parts.Length > 1 ? parts[1] : "";
-
-        var process = new Process
+        StartInfo = new ProcessStartInfo
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = fileName,
-                Arguments = arguments,
-                UseShellExecute = false,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
-                CreateNoWindow = true // Optional: don't show a console window
-            }
-        };
+            FileName = shell,
+            Arguments = prefix + command,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true
+        }
+    };
 
-        process.Start(); // Run in background, method continues without waiting
-    }
+    process.Start();
+    string output = process.StandardOutput.ReadToEnd();
+    string error = process.StandardError.ReadToEnd();
+
+    process.WaitForExit();
+    File.AppendAllText("./debug.log",
+        $"Executing command: {command}\nOutput: {output}\nError: {error}\nExit: {process.ExitCode}\n\n");
+}
+
+
 
     public bool ExecuteChecker(string command)
     {
-        var parts = command.Split(' ', 2); // Split into program and arguments
-        string fileName = parts[0];
-        string arguments = parts.Length > 1 ? parts[1] : "";
+        string shell;
+        string prefix;
+
+        if (OperatingSystem.IsWindows())
+        {
+            shell = "cmd.exe";
+            prefix = "/c ";
+        }
+        else
+        {
+            shell = "/bin/bash";
+            prefix = "-c ";
+        }
 
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = fileName,
-                Arguments = arguments,
+                FileName = shell,
+                Arguments = prefix + command,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -416,13 +433,20 @@ public class Questionare{
 
         process.Start();
 
-        // Read the output (can be async too, but here we keep it simple)
-        string output = process.StandardOutput.ReadToEnd().Trim().ToLower();
+        string output = process.StandardOutput.ReadToEnd()
+                                            .Trim()
+                                            .ToLower();
 
         process.WaitForExit();
+        // using (var logStream = new StreamWriter("./debug.log", append: true))
+        // {
+        //     logStream.WriteLine($"Checker command: {command}");
+        //     logStream.WriteLine($"Checker output: {output}");
+        // }
 
         return output.Contains("true");
     }
+
 public async Task<bool> HandleQuestion(
     Layout root,
     Layout questionPanel,
