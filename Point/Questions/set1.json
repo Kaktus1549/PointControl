@@ -1,0 +1,102 @@
+[
+    {
+        "questionText": "Co byla slepá větev lidské evoluce?",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": false,
+            "answerList": ["Homo Erektus", "Homo Habilis", "Homo neanderthalensis"],
+            "correctAnswer": "Homo neanderthalensis"
+        }
+    },
+    {
+        "questionText": "Can you decihper this? Answer convert to numbers based on their index in alphabet: November Alpha Tango Oscar Victor Sierra Charlie Charlie Tango (no spaces)",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": true,
+            "correctAnswer": "141201522193320"
+        }
+    },
+    {
+        "questionText": "Enough hacking for now, lets do 20 clicks, after you are done, your superivsor will give you the code!",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": true,
+            "correctAnswer": "klik"
+        }
+    },
+    {
+        "questionText": "Oh noo! The IED exploded and wounded one of your teammates! You need to provide him first aid quickly!",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": true,
+            "correctAnswer": "medic"
+        }
+    },
+    {
+        "questionText": "Windows have funni thing called 'registry' can you find your answer in 'HKEY_LOCAL_MACHINE\\System\\AIRSPORT'?",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": true,
+            "correctAnswer": "WIDL3"
+        }
+    },
+    {
+        "questionText": "Windows have funni thing called 'registry' can you find your answer in 'HKEY_USERS\\.DEFAULT\\Console\\AIRSPORT'?",
+        "outsorced": false,
+        "exec": null,
+        "answer":{
+            "checkerNeeded": false,
+            "checker": null,
+            "dynamic": true,
+            "correctAnswer": "US3R"
+        }
+    },
+    {
+        "questionText": "Connect to this ssh to get flag: ssh user@localhost -p 2221",
+        "outsorced": true,
+        "exec": "cd ../ulohy-skajp/SimpleCat && docker compose up -d",
+        "answer":{
+            "checkerNeeded": true,
+            "checker": "python ../ulohy-skajp/SimpleCat/killer.py",
+            "dynamic": true,
+            "correctAnswer": null
+        }
+    },
+    {
+            "questionText": "Connect to this ssh to get flag: ssh user@localhost -p 2223",
+            "outsorced": true,
+            "exec": "cd ../ulohy-skajp/SimpleHiddenCat && docker compose up -d",
+            "answer":{
+                "checkerNeeded": true,
+                "checker": "python ../ulohy-skajp/SimpleHiddenCat/killer.py",
+                "dynamic": true,
+                "correctAnswer": null
+            }
+    },
+    {
+            "questionText": "Connect to this ssh to get flag: ssh user@localhost -p 2222",
+            "outsorced": true,
+            "exec": "cd ../ulohy-skajp/SimpleBase64 && docker compose up -d",
+            "answer":{
+                "checkerNeeded": true,
+                "checker": "python ../ulohy-skajp/SimpleBase64/killer.py",
+                "dynamic": true,
+                "correctAnswer": null
+            }
+    }
+]
